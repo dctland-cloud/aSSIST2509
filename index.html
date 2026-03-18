@@ -105,6 +105,21 @@
         .btn-call { background: var(--primary-light); color: var(--primary); }
         .btn-nav { background: var(--primary); color: #fff; }
 
+        /* Marker Name Overlay */
+        .custom-overlay {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            border: 1px solid var(--primary-light);
+            color: var(--text-main);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 2px 8px;
+            box-shadow: 0px 2px 6px rgba(0,0,0,0.15);
+            transform: translateY(22px);
+            white-space: nowrap;
+            pointer-events: none; /* Let clicks pass through to map or marker */
+        }
+
         #loading {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999;
             background: rgba(255,255,255,0.9); display: flex; flex-direction: column;
@@ -257,6 +272,17 @@
             const pos = new kakao.maps.LatLng(contact.lat, contact.lng);
             const marker = new kakao.maps.Marker({ position: pos, map: map });
             marker.contactData = contact;
+            
+            // Name Overlay
+            const overlayContent = `<div class="custom-overlay">${contact.name}</div>`;
+            const customOverlay = new kakao.maps.CustomOverlay({
+                position: pos,
+                content: overlayContent,
+                map: map,
+                yAnchor: 0
+            });
+            marker.customOverlay = customOverlay;
+            
             markers.push(marker);
 
             kakao.maps.event.addListener(marker, 'click', function() {
@@ -377,6 +403,7 @@
                 const d = m.contactData;
                 const match = d.name.toLowerCase().includes(query) || d.company.toLowerCase().includes(query);
                 m.setMap(match ? map : null);
+                if (m.customOverlay) m.customOverlay.setMap(match ? map : null);
                 if (match) {
                     bounds.extend(m.getPosition());
                     hasVisible = true;
