@@ -455,8 +455,8 @@
             });
 
             if (matchedMarkers.length === 1 && query.trim()) {
-                map.panTo(matchedMarkers[0].getPosition());
                 map.setLevel(4);
+                map.setCenter(matchedMarkers[0].getPosition());
             } else if (matchedMarkers.length > 1) {
                 map.setBounds(bounds);
             }
