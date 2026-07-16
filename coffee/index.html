@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#3b2417">
+  <title>오늘 누구랑 커피?</title>
+  <meta name="description" content="aSSIST 동기 중 오늘 커피 한잔할 인연을 랜덤으로 만나보세요.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://dctland-cloud.github.io/aSSIST2509/coffee/">
+  <meta property="og:title" content="☕ 오늘 누구랑 커피?">
+  <meta property="og:description" content="버튼 한 번으로 오늘 연락할 aSSIST 동기를 뽑아보세요!">
+  <meta property="og:image" content="https://dctland-cloud.github.io/aSSIST2509/og-assist-map.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --coffee: #3b2417;
+      --coffee-2: #6d442c;
+      --cream: #fff8ec;
+      --foam: #fffdf8;
+      --orange: #ff8a3d;
+      --orange-2: #ffb36b;
+      --mint: #69d4c7;
+      --ink: #2d211b;
+      --muted: #78685f;
+      --shadow: 0 24px 70px rgba(41, 22, 10, .24);
+    }
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Gowun Dodum", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(255,179,107,.42), transparent 25rem),
+        radial-gradient(circle at 90% 88%, rgba(105,212,199,.25), transparent 27rem),
+        linear-gradient(145deg, #422719 0%, #70452d 55%, #3b2417 100%);
+      overflow-x: hidden;
+    }
+    body::before, body::after {
+      content: "";
+      position: fixed;
+      width: 220px;
+      height: 220px;
+      border: 2px solid rgba(255,255,255,.08);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    body::before { left: -90px; bottom: -100px; }
+    body::after { right: -120px; top: 80px; width: 300px; height: 300px; }
+    button, select, input { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+    .app {
+      width: min(100%, 560px);
+      min-height: 100svh;
+      margin: 0 auto;
+      padding: max(24px, env(safe-area-inset-top)) 18px max(34px, env(safe-area-inset-bottom));
+      position: relative;
+      z-index: 1;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: rgba(255,255,255,.78);
+      font-size: 13px;
+      letter-spacing: .08em;
+      margin-bottom: 14px;
+    }
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 11px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 99px;
+      background: rgba(255,255,255,.08);
+      backdrop-filter: blur(10px);
+    }
+    .hero { color: white; padding: 8px 4px 24px; }
+    .eyebrow { margin: 0 0 4px; color: #ffd7b5; font-size: 14px; }
+    h1 {
+      margin: 0;
+      font-family: "Jua", sans-serif;
+      font-size: clamp(36px, 9vw, 52px);
+      line-height: 1.05;
+      font-weight: 400;
+      letter-spacing: -.035em;
+      text-shadow: 0 5px 18px rgba(0,0,0,.16);
+    }
+    .hero p:last-child { margin: 10px 0 0; color: rgba(255,255,255,.76); line-height: 1.6; font-size: 14px; }
+    .panel {
+      background: rgba(255,248,236,.97);
+      border: 1px solid rgba(255,255,255,.55);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .controls {
+      padding: 18px 18px 15px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      border-bottom: 1px solid rgba(59,36,23,.08);
+    }
+    .field { display: grid; gap: 6px; }
+    .field label { font-size: 12px; color: var(--muted); padding-left: 3px; }
+    select {
+      width: 100%;
+      border: 1px solid #e6d9c8;
+      border-radius: 14px;
+      padding: 11px 34px 11px 12px;
+      color: var(--ink);
+      background: var(--foam);
+      outline: none;
+      appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, #7d695e 50%), linear-gradient(135deg, #7d695e 50%, transparent 50%);
+      background-position: calc(100% - 17px) 52%, calc(100% - 12px) 52%;
+      background-size: 5px 5px;
+      background-repeat: no-repeat;
+    }
+    select:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(255,138,61,.15); }
+    .toggle-row {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9px 4px 0;
+      color: #604d42;
+      font-size: 13px;
+    }
+    .switch { position: relative; width: 46px; height: 26px; flex: 0 0 auto; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; inset: 0; border-radius: 99px; background: #d8c9b8; transition: .2s; cursor: pointer; }
+    .slider::before { content: ""; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px; border-radius: 50%; background: white; box-shadow: 0 2px 5px rgba(0,0,0,.18); transition: .2s; }
+    .switch input:checked + .slider { background: var(--mint); }
+    .switch input:checked + .slider::before { transform: translateX(20px); }
+    .stage { padding: 22px 18px 18px; text-align: center; position: relative; }
+    .cup {
+      width: 72px;
+      height: 56px;
+      margin: 0 auto 12px;
+      border-radius: 8px 8px 26px 26px;
+      background: linear-gradient(135deg, #fff, #f5dfc8);
+      box-shadow: inset 0 -8px 14px rgba(109,68,44,.12), 0 10px 16px rgba(84,48,25,.12);
+      position: relative;
+    }
+    .cup::before { content: ""; position: absolute; width: 24px; height: 28px; border: 7px solid #f5dfc8; border-left: 0; border-radius: 0 18px 18px 0; right: -22px; top: 8px; }
+    .cup::after { content: ""; position: absolute; width: 54px; height: 12px; border-radius: 50%; background: #5d3823; left: 9px; top: -4px; box-shadow: inset 0 2px 0 rgba(255,255,255,.2); }
+    .steam { height: 24px; display: flex; justify-content: center; gap: 8px; margin-bottom: -3px; }
+    .steam i { width: 3px; height: 22px; border-radius: 50%; background: rgba(255,255,255,.45); animation: steam 2.4s ease-in-out infinite; }
+    .steam i:nth-child(2) { animation-delay: .55s; height: 18px; }
+    @keyframes steam { 0%,100% { transform: translateY(6px) scaleX(1); opacity: .2; } 50% { transform: translateY(-4px) scaleX(2.6); opacity: .75; } }
+    .slot {
+      min-height: 154px;
+      display: grid;
+      place-content: center;
+      padding: 10px 8px 16px;
+    }
+    .slot-label { font-size: 12px; color: var(--orange); font-weight: 700; letter-spacing: .08em; margin-bottom: 4px; }
+    .slot-name { font-family: "Jua", sans-serif; font-size: 42px; line-height: 1.05; color: var(--coffee); min-height: 46px; }
+    .slot-company { margin-top: 7px; color: var(--muted); font-size: 14px; line-height: 1.45; }
+    .slot.spinning .slot-name { animation: blur .12s linear infinite; }
+    @keyframes blur { 50% { opacity: .45; transform: translateY(2px) scale(.98); filter: blur(1px); } }
+    .draw-btn {
+      width: 100%;
+      min-height: 58px;
+      border: 0;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--orange), #ff6d2d);
+      color: white;
+      font-family: "Jua", sans-serif;
+      font-size: 21px;
+      letter-spacing: .01em;
+      box-shadow: 0 12px 26px rgba(255,110,45,.3), inset 0 1px 0 rgba(255,255,255,.35);
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .draw-btn:active { transform: translateY(2px) scale(.99); box-shadow: 0 6px 14px rgba(255,110,45,.25); }
+    .draw-btn:disabled { cursor: wait; opacity: .75; }
+    .result {
+      display: none;
+      border-top: 1px dashed #dbcbbb;
+      padding-top: 17px;
+      margin-top: 17px;
+      text-align: left;
+    }
+    .result.show { display: block; animation: rise .35s ease-out; }
+    @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+    .result-meta { display: grid; gap: 7px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .result-meta div { display: flex; gap: 8px; align-items: flex-start; }
+    .result-meta span:first-child { flex: 0 0 19px; }
+    .actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
+    .action {
+      border: 1px solid #e6d8c6;
+      background: var(--foam);
+      color: var(--coffee);
+      text-decoration: none;
+      border-radius: 14px;
+      min-height: 52px;
+      display: grid;
+      place-content: center;
+      gap: 2px;
+      text-align: center;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .action b { font-size: 18px; font-weight: 400; line-height: 1; }
+    .action.share { background: #fee500; border-color: #f1d900; color: #3c1e1e; }
+    .contacted-btn {
+      width: 100%;
+      border: 0;
+      border-radius: 13px;
+      margin-top: 9px;
+      padding: 10px;
+      color: #377c73;
+      background: #e1f7f3;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .contacted-btn.done { color: #6d5b50; background: #eee5da; }
+    .footer-card {
+      color: rgba(255,255,255,.82);
+      padding: 18px 4px 0;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      font-size: 13px;
+    }
+    .stats strong { color: white; }
+    .history { margin-top: 14px; display: flex; gap: 7px; flex-wrap: wrap; }
+    .history:empty { display: none; }
+    .history-chip { border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.08); color: rgba(255,255,255,.78); border-radius: 99px; padding: 6px 9px; font-size: 11px; }
+    .toast { position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom)); transform: translate(-50%, 20px); padding: 11px 16px; background: #21150f; color: white; border-radius: 99px; font-size: 13px; opacity: 0; pointer-events: none; transition: .25s; z-index: 9; white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 8; overflow: hidden; }
+    .confetti i { position: absolute; top: -20px; width: 9px; height: 15px; border-radius: 2px; animation: fall 1.8s ease-in forwards; }
+    @keyframes fall { to { transform: translate3d(var(--drift), 105vh, 0) rotate(720deg); opacity: .2; } }
+    @media (max-width: 380px) {
+      .controls { grid-template-columns: 1fr; }
+      .toggle-row { grid-column: 1; }
+      .actions { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 720px) {
+      .app { padding-top: 42px; }
+      .panel { border-radius: 32px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="brand">
+      <span class="brand-badge">aSSIST 2509</span>
+      <span>인연 깨우기 프로젝트</span>
+    </div>
+
+    <section class="hero">
+      <p class="eyebrow">오늘의 작은 연락이 큰 인연으로</p>
+      <h1>오늘 누구랑<br>커피? ☕</h1>
+      <p>룰렛을 돌려 오늘 안부를 물을 동기를 만나보세요.<br>부담 없이, 커피 한잔부터!</p>
+    </section>
+
+    <section class="panel" aria-label="랜덤 동기 뽑기">
+      <div class="controls">
+        <div class="field">
+          <label for="meSelect">나는 누구?</label>
+          <select id="meSelect" aria-label="내 이름 선택"></select>
+        </div>
+        <div class="field">
+          <label for="companySelect">어디서 뽑을까?</label>
+          <select id="companySelect" aria-label="회사 필터"></select>
+        </div>
+        <div class="toggle-row">
+          <span>이번 달 아직 연락 안 한 동기만</span>
+          <label class="switch">
+            <input type="checkbox" id="freshOnly">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="steam" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="cup" aria-hidden="true"></div>
+        <div class="slot" id="slot" aria-live="polite">
+          <div class="slot-label" id="slotLabel">READY?</div>
+          <div class="slot-name" id="slotName">인연을 깨워보세요</div>
+          <div class="slot-company" id="slotCompany">총 <span id="eligibleCount">0</span>명의 동기가 기다리고 있어요</div>
+        </div>
+
+        <button class="draw-btn" id="drawBtn">☕ 랜덤 동기 뽑기</button>
+
+        <div class="result" id="result">
+          <div class="result-meta">
+            <div id="roleRow"><span>💼</span><span id="roleText"></span></div>
+            <div id="addressRow"><span>📍</span><span id="addressText"></span></div>
+          </div>
+          <div class="actions">
+            <a class="action" id="callBtn"><b>☎️</b><span>전화</span></a>
+            <a class="action" id="smsBtn"><b>💬</b><span>문자</span></a>
+            <a class="action" id="mapBtn" target="_blank" rel="noopener"><b>🗺️</b><span>지도</span></a>
+            <button class="action share" id="shareBtn"><b>↗</b><span>카톡 공유</span></button>
+          </div>
+          <button class="contacted-btn" id="contactedBtn">✓ 이번 달 연락 완료로 표시</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-card">
+      <div class="stats">전체 <strong id="totalCount">0명</strong> · 이번 달 연락 <strong id="contactedCount">0명</strong></div>
+      <div id="monthLabel"></div>
+    </div>
+    <div class="history" id="history" aria-label="최근 뽑은 동기"></div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+  <div class="confetti" id="confetti"></div>
+
+  <script>
+    const contacts = [{"name": "송동근", "company": "SK 네트웍스서비스", "department": "성장전략팀 / 경영전략실", "title": "팀장", "phone": "010-7327-7677", "email": "dks@sk.com", "address": "서울시 중구 세종대로9길 41 14층"}, {"name": "최무근", "company": "HELLOWORKS", "department": "플랫폼사업기획", "title": "팀장", "phone": "010-9534-4277", "email": "mukeun.choi@helloworks.io", "address": "서울특별시 마포구 토정로25길9 (용강동, 태민빌딩)"}, {"name": "이용훈", "company": "히츠", "department": "AI 플랫폼사업본부", "title": "플랫폼사업본부장 | IR 총괄", "phone": "010-3175-7977", "email": "owen@hits.ai", "address": "서울시 강남구 테헤란로4길 28 송민빌딩 8층"}, {"name": "전장혁", "company": "고원시스템", "department": "ICT본부", "title": "상무", "phone": "010-2720-6920", "email": "j.h.choen@goone.co.kr", "address": "서울시 강서구 화곡로68길 15 1303호 (등촌동, 아벨테크노)"}, {"name": "송명철", "company": "과학기술연합대학원대학교", "department": "경영지원실", "title": "", "phone": "010-5267-7794", "email": "mikesong@ust.ac.kr", "address": "대전광역시 유성구 가정로 217"}, {"name": "김성주", "company": "AUTOROBOTICS", "department": "", "title": "대표", "phone": "010-6254-6998", "email": "autorobotics0617@naver.com", "address": "대구시 달서구 달구벌대로 1035 계명대학교,첨단건설재료실험센터, 305호"}, {"name": "이창윤", "company": "크리에이티브코드", "department": "", "title": "대표이사", "phone": "010-3377-7025", "email": "ceo@creativecode.co.kr", "address": "서울특별시 강남구 논현로30길 51 석진빌딩 2층"}, {"name": "계성종", "company": "고려아연", "department": "크루서블 밸류크리에이션 사업부 / Project Management Office (PMO)", "title": "수석 / General Manager", "phone": "010-3605-9186", "email": "kye@koreazinc.co.kr", "address": "서울특별시 종로구 종로 33 그랑서울 타워1 (03159)", "lat": 37.5709617749066, "lng": 126.981437983842}, {"name": "박배영", "company": "한국경영인증원", "department": "", "title": "심사원", "phone": "010-7410-0003", "email": "paeyoungpark@gmail.com", "address": "서울특별시 영등포구 경인로 775 (문래동 3가) 에이스하이테크시티 1동 1204호"}, {"name": "서성균", "company": "한영회계법인", "department": "구매팀", "title": "차장", "phone": "010-2554-8146", "email": "joseph-seongkyun.seo@kr.ey.com", "address": "서울특별시 영등포구 여의공원로111 태영빌딩 8F"}, {"name": "이민호", "company": "핀인사이트", "department": "전략기획팀", "title": "대표이사", "phone": "010-9066-3493", "email": "daniel@fins.ai", "address": "영등포구 의사당대로 83 오투타워 17-110호"}, {"name": "최주옥", "company": "한국지능정보사회진흥원", "department": "Department of Global ICT Cooperation / Global Digital Planning Team", "title": "Executive Principal", "phone": "010-3939-4284", "email": "sjochoi@nia.or.kr", "address": "제주특별자치도 서귀포시 서호중앙로 68-11"}, {"name": "서욱", "company": "ECONINE", "department": "ECONINE EcoVadis Training Center", "title": "CEO / CSO / Center Leader", "phone": "010-6666-9808", "email": "ceo@econine.kr", "address": "서울특별시 마포구 양화로 186 530호"}, {"name": "백성우", "company": "트리즈엔", "department": "", "title": "대표이사", "phone": "010-4344-4711", "email": "sw.baek@trizn.kr", "address": "경기도 수원시 영통구 대학3로4번길 36 테라스힐2차 201호(이의동)"}, {"name": "박종일", "company": "쿠팡(주)", "department": "AI Software Engineering", "title": "Staff Backend Engineer II", "phone": "010-7603-9236", "email": "jopark190@coupang.com", "address": "서울특별시 송파구 송파대로 570"}, {"name": "고민정", "company": "한국 리미니스트리트", "department": "", "title": "상무", "phone": "010-8584-6754", "email": "mkoh@riministreet.com", "address": "서울특별시 강남구 영동대로 511 트레이드 타워, 4006호(40층)"}, {"name": "박인규", "company": "aws", "department": "Insurance & Capital Leader / Financial Services Industry (금융고객팀)", "title": "Senior Sales Manager", "phone": "010-7140-8817", "email": "inkyp@amazon.com", "address": "서울특별시 강남구 테헤란로 231 (역삼동, 센터필드) East 건물12층"}, {"name": "이문호", "company": "삼성엔지니어링", "department": "산업배관설계그룹", "title": "수석", "phone": "010-8652-2047", "email": "munho419.lee@samsung.com", "address": "서울특별시 강동구 상일로 6길 26 삼성GEC"}, {"name": "박나래", "company": "스탭스", "department": "디택트사업팀", "title": "이사 / 책임커리어디자이너", "phone": "010-8939-1531", "email": "nbkh27@staffs.co.kr", "address": "서울시 중구 동호로14길 7"}, {"name": "강남규", "company": "KB 국민은행", "department": "인프라시스템부", "title": "팀장", "phone": "010-8582-9499", "email": "cptkang@kbfg.com", "address": "서울 영등포구 의사당대로 13 동관 9층 (여의도동,서여의도본점)", "lat": 37.5286254, "lng": 126.9185825}, {"name": "최영오", "company": "씨젠", "department": "New Business Team", "title": "Head Manager", "phone": "010-4719-7928", "email": "yochoi@seegene.com", "address": "서울특별시 송파구 잠실로 209"}, {"name": "박성아", "company": "KAIDIA", "department": "", "title": "대표이사", "phone": "010-6760-6578", "email": "seongah.park@gmail.com", "address": "서울특별시 강남구 언주로30길 10 현대비젼21 819호"}, {"name": "문지원", "company": "예찬 365일 데이케어", "department": "", "title": "대표", "phone": "010-4634-3011", "email": "mjw3011@naver.com", "address": "전주시 덕진구 백제대로 748-1"}, {"name": "이재영", "company": "퍼스널에이아이 ㈜", "department": "경희대학교 AI기술경영학과", "title": "CEO, 교수", "phone": "010-6856-2235", "email": "michael.lee@snplab.io", "address": "서울특별시 서초구 매헌로 16"}, {"name": "구혜진", "company": "모리온 하우스", "department": "", "title": "Creative Art Director / CEO", "phone": "010-2661-8207", "email": "goo@morionhaus.com", "address": "서울특별시 강남구 테헤란로1길 28-11 4층 4143 호 (역삼동, 조이빌딩)"}, {"name": "유동환", "company": "일동제약", "department": "PI추진실 AI전략팀", "title": "부장", "phone": "010-3120-6789", "email": "asparaguss@ildong.com", "address": "서울특별시 서초구 바우뫼로27길 2"}, {"name": "김우영", "company": "KOICA", "department": "데이터팀", "title": "대리", "phone": "010-9215-7411", "email": "kwy@koica.go.kr", "address": "경기도 성남시 수정구 대왕판교로 825 한국국제협력단"}, {"name": "노성구", "company": "Rubber Captain", "department": "", "title": "상무", "phone": "010-2293-6448", "email": "rubbercaptain@naver.com", "address": "서울특별시 서초구 강남대로 309"}, {"name": "김동옥", "company": "NAVER", "department": "ETECH", "title": "", "phone": "010-9484-6052", "email": "dongock.kim@navercorp.com", "address": "경기도 성남시 분당구 정자일로 95"}, {"name": "임승엽", "company": "휴먼솔루션그룹", "department": "교육기획실", "title": "팀장", "phone": "010-2971-1041", "email": "sylim@hsg.or.kr", "address": "서울시 중구 장충단로 200 혜인빌딩 4,5층"}, {"name": "김민성", "company": "포그니병원", "department": "", "title": "행정원장 / 종로문화재단이사 / 국제로타리 3650지구 서울 정동 RC 회장", "phone": "010-4020-4339", "email": "mskim924@gmail.com", "address": "서울시 구로구 경인로 393-7 일이삼전자타운 2동 6,7층"}, {"name": "유용미", "company": "이언그룹", "department": "", "title": "대표", "phone": "010-5732-8860", "email": "yym@eongroup.co.kr", "address": "서울시 중구 청계천로 100 시그니처타워 10층"}, {"name": "오현철", "company": "부광약품", "department": "수원/원주병원팀", "title": "팀장", "phone": "010-3797-5964", "email": "hyun.cheol.oh@bukwang.co.kr", "address": "서울특별시 동작구 상도로 7 (대방동)"}, {"name": "이상학", "company": "케이티앤지", "department": "", "title": "총괄부문장(COO/CFO) / 수석부사장", "phone": "010-4586-0399", "email": "sean.lee@ktng.com", "address": "서울시 강남구 영동대로 416 KT&G타워 20층"}, {"name": "전덕조", "company": "씨큐비스타", "department": "", "title": "CISSP / 대표이사 / GSEC", "phone": "010-8783-6068", "email": "dejeon@cqvista.com", "address": "경기도 성남시 분당구 판교로 255번길 9-22 5F 511호"}, {"name": "한재호", "company": "에이쓰리시큐리티", "department": "", "title": "대표이사", "phone": "010-7131-4651", "email": "jhhan@a3sc.co.kr", "address": "서울특별시 영등포구 선유로9길 10 문래SK V1 CENTER 1710, 1711호"}, {"name": "박덕신", "company": "동화기업", "department": "디지털혁신실 TECH 부문", "title": "부문장", "phone": "010-7200-9786", "email": "icf2000@dongwha.com", "address": "서울 영등포구 여의나루로 53-2 원창빌딩"}, {"name": "임소연", "company": "다큐멘터리 봄", "department": "", "title": "CEO/프로듀서/Ph.D", "phone": "010-3286-6127", "email": "syim827@gmail.com", "address": "서울특별시 마포구 마포대로 33"}, {"name": "김경석", "company": "애서튼국제외국인학교", "department": "", "title": "대표 / 총교장", "phone": "010-4852-2100", "email": "kks@atherton.sc.kr", "address": "경상남도 거제시 서간도길 9-8"}, {"name": "한재수", "company": "ABRAXAS Investment", "department": "", "title": "파트너", "phone": "010-3601-6520", "email": "dajiyeon@gmail.com", "address": "서울시 용산구 신흥로11길 52"}, {"name": "이형철", "company": "KB금융그룹", "department": "국민은행 정보보호부(P) / KB금융지주 그룹 아키텍처센터", "title": "수석차장", "phone": "010-5129-7600", "email": "hc.lee@kbfg.com", "address": "서울 영등포구 의사당대로 13 여의도 IT센터 동관 9층 (여의도동)"}, {"name": "이수범", "company": "LG AI연구원", "department": "Al Biz Transformation Unit", "title": "Senior AI Consultant", "phone": "010-2280-7517", "email": "subeom.lee@lgresearch.ai", "address": "서울특별시 강서구 마곡중앙로 150"}, {"name": "최윤정", "company": "영원아웃도어", "department": "디지털 부문", "title": "상무 / ISO23001, ISO27001 인증심사원 / CISO", "phone": "010-2261-7555", "email": "yjchoi@youngone.co.kr", "address": "경기도 성남시 중원구 광명로 293"}, {"name": "이종섭", "company": "코오롱인더스트리", "department": "C&J 마케팅 Part / C&J 사업부", "title": "차장", "phone": "010-9622-8020", "email": "brant@kolon.com", "address": "서울특별시 강남구 삼성로 518"}];
+    const SHARE_URL = "https://dctland-cloud.github.io/aSSIST2509/coffee/";
+    const monthKey = new Date().toISOString().slice(0, 7);
+    const contactedKey = `coffee-contacted-${monthKey}`;
+    const meKey = "coffee-my-name";
+
+    const $ = id => document.getElementById(id);
+    let current = null;
+    let lastName = "";
+    let historyNames = [];
+    let contacted = new Set(JSON.parse(localStorage.getItem(contactedKey) || "[]"));
+
+    function safeText(value) { return String(value || "").trim(); }
+    function uniqueCompanies() {
+      return [...new Set(contacts.map(c => safeText(c.company)).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ko"));
+    }
+    function randomIndex(max) {
+      if (max <= 1) return 0;
+      const values = new Uint32Array(1);
+      crypto.getRandomValues(values);
+      return values[0] % max;
+    }
+    function currentPool() {
+      const me = $("meSelect").value;
+      const company = $("companySelect").value;
+      const freshOnly = $("freshOnly").checked;
+      return contacts.filter(c =>
+        c.name !== me &&
+        (!company || c.company === company) &&
+        (!freshOnly || !contacted.has(c.name))
+      );
+    }
+    function populateControls() {
+      const names = [...contacts].sort((a, b) => a.name.localeCompare(b.name, "ko"));
+      $("meSelect").innerHTML = `<option value="">내 이름 선택 안 함</option>` + names.map(c => `<option value="${c.name}">${c.name}</option>`).join("");
+      const savedMe = localStorage.getItem(meKey);
+      $("meSelect").value = names.some(c => c.name === savedMe) ? savedMe : (names.some(c => c.name === "송동근") ? "송동근" : "");
+      $("companySelect").innerHTML = `<option value="">전체 동기</option>` + uniqueCompanies().map(company => `<option value="${company}">${company}</option>`).join("");
+      $("totalCount").textContent = `${contacts.length}명`;
+      const [year, month] = monthKey.split("-");
+      $("monthLabel").textContent = `${year}.${month}`;
+      updateCounts();
+    }
+    function updateCounts() {
+      const eligibleCount = $("eligibleCount");
+      if (eligibleCount) eligibleCount.textContent = currentPool().length;
+      $("contactedCount").textContent = `${contacted.size}명`;
+    }
+    function choose(pool) {
+      let choices = pool;
+      if (pool.length > 1) choices = pool.filter(c => c.name !== lastName);
+      return choices[randomIndex(choices.length)];
+    }
+    function draw() {
+      const pool = currentPool();
+      if (!pool.length) {
+        showToast("조건에 맞는 동기가 없어요. 필터를 바꿔보세요!");
+        return;
+      }
+      $("drawBtn").disabled = true;
+      $("result").classList.remove("show");
+      $("slot").classList.add("spinning");
+      $("slotLabel").textContent = "두근두근 뽑는 중";
+      let ticks = 0;
+      const timer = setInterval(() => {
+        const preview = pool[randomIndex(pool.length)];
+        $("slotName").textContent = preview.name;
+        $("slotCompany").textContent = preview.company || "멋진 동기";
+        ticks++;
+        if (ticks >= 24) {
+          clearInterval(timer);
+          reveal(choose(pool));
+        }
+      }, 70 + ticks * 3);
+    }
+    function reveal(contact) {
+      current = contact;
+      lastName = contact.name;
+      $("slot").classList.remove("spinning");
+      $("slotLabel").textContent = "오늘의 커피 메이트";
+      $("slotName").textContent = contact.name;
+      $("slotCompany").textContent = contact.company || "aSSIST 동기";
+      const role = [contact.title, contact.department].filter(Boolean).join(" · ");
+      $("roleText").textContent = role || contact.company || "반가운 동기";
+      $("roleRow").hidden = !role && !contact.company;
+      $("addressText").textContent = contact.address || "주소 정보 없음";
+      $("addressRow").hidden = !contact.address;
+      $("callBtn").href = contact.phone ? `tel:${contact.phone.replace(/[^0-9+]/g, "")}` : "#";
+      $("smsBtn").href = contact.phone ? `sms:${contact.phone.replace(/[^0-9+]/g, "")}?body=${encodeURIComponent(`${contact.name} 박사님, 오늘 커피 한잔 어떠세요? ☕`)}` : "#";
+      $("mapBtn").href = `https://map.kakao.com/link/search/${encodeURIComponent(contact.address || contact.company || contact.name)}`;
+      updateContactedButton();
+      $("result").classList.add("show");
+      $("drawBtn").textContent = "🔄 다른 동기 다시 뽑기";
+      $("drawBtn").disabled = false;
+      addHistory(contact.name);
+      burstConfetti();
+    }
+    function updateContactedButton() {
+      const done = current && contacted.has(current.name);
+      $("contactedBtn").classList.toggle("done", done);
+      $("contactedBtn").textContent = done ? "↩ 연락 완료 표시 취소" : "✓ 이번 달 연락 완료로 표시";
+    }
+    function toggleContacted() {
+      if (!current) return;
+      if (contacted.has(current.name)) contacted.delete(current.name);
+      else contacted.add(current.name);
+      localStorage.setItem(contactedKey, JSON.stringify([...contacted]));
+      updateContactedButton();
+      updateCounts();
+      showToast(contacted.has(current.name) ? `${current.name} 박사님, 연락 완료!` : "연락 완료 표시를 취소했어요");
+    }
+    async function shareResult() {
+      if (!current) return;
+      const text = `☕ 오늘의 커피 메이트는 ${current.name} 박사님!\n${current.company || "aSSIST 동기"}\n우리도 오늘 커피 룰렛 돌려볼까요?`;
+      if (navigator.share) {
+        try { await navigator.share({ title: "오늘 누구랑 커피?", text, url: SHARE_URL }); }
+        catch (error) { if (error.name !== "AbortError") copyShare(text); }
+      } else copyShare(text);
+    }
+    async function copyShare(text) {
+      await navigator.clipboard.writeText(`${text}\n${SHARE_URL}`);
+      showToast("공유 문구와 주소를 복사했어요");
+    }
+    function addHistory(name) {
+      historyNames = [name, ...historyNames.filter(n => n !== name)].slice(0, 5);
+      $("history").innerHTML = historyNames.map(n => `<span class="history-chip">최근 · ${n}</span>`).join("");
+    }
+    function showToast(message) {
+      $("toast").textContent = message;
+      $("toast").classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => $("toast").classList.remove("show"), 1900);
+    }
+    function burstConfetti() {
+      const colors = ["#ff8a3d", "#69d4c7", "#fee500", "#ffffff", "#ff7a9a"];
+      $("confetti").innerHTML = Array.from({ length: 36 }, (_, i) =>
+        `<i style="left:${randomIndex(100)}%;background:${colors[i % colors.length]};--drift:${randomIndex(180)-90}px;animation-delay:${randomIndex(220)}ms"></i>`
+      ).join("");
+      setTimeout(() => $("confetti").innerHTML = "", 2300);
+    }
+
+    $("drawBtn").addEventListener("click", draw);
+    $("contactedBtn").addEventListener("click", toggleContacted);
+    $("shareBtn").addEventListener("click", shareResult);
+    $("meSelect").addEventListener("change", () => { localStorage.setItem(meKey, $("meSelect").value); updateCounts(); });
+    $("companySelect").addEventListener("change", updateCounts);
+    $("freshOnly").addEventListener("change", updateCounts);
+    populateControls();
+  </script>
+</body>
+</html>
+
