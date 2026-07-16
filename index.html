@@ -440,7 +440,7 @@
         const searchInput = document.getElementById('searchInput');
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase();
-            let hasVisible = false;
+            const matchedMarkers = [];
             const bounds = new kakao.maps.LatLngBounds();
 
             markers.forEach(m => {
@@ -450,9 +450,16 @@
                 if (m.customOverlay) m.customOverlay.setMap(match ? map : null);
                 if (match) {
                     bounds.extend(m.getPosition());
-                    hasVisible = true;
+                    matchedMarkers.push(m);
                 }
             });
+
+            if (matchedMarkers.length === 1 && query.trim()) {
+                map.panTo(matchedMarkers[0].getPosition());
+                map.setLevel(4);
+            } else if (matchedMarkers.length > 1) {
+                map.setBounds(bounds);
+            }
             
             if(document.getElementById('listModal').classList.contains('active')) {
                 renderList(); // Update list while searching if open
