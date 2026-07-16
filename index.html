@@ -204,6 +204,7 @@
         let map;
         let geocoder;
         let markers = [];
+        let markerBasePositions = [];
         let completedGeocodes = 0;
         let myLocationMarker = null;
 
@@ -287,8 +288,35 @@
             });
         }
 
+        function getDisplayPosition(contact) {
+            const lat = Number(contact.lat);
+            const lng = Number(contact.lng);
+            const overlapIndex = markerBasePositions.filter(base =>
+                Math.abs(base.lat - lat) < 0.00015 &&
+                Math.abs(base.lng - lng) < 0.00015
+            ).length;
+
+            markerBasePositions.push({ lat, lng });
+            if(overlapIndex === 0) {
+                return new kakao.maps.LatLng(lat, lng);
+            }
+
+            // 같은 건물의 연락처가 겹치면 화면상의 마커만 주변으로 벌린다.
+            // 길찾기에는 contact.lat/contact.lng의 실제 좌표를 그대로 사용한다.
+            const slotsPerRing = 8;
+            const slot = (overlapIndex - 1) % slotsPerRing;
+            const ring = Math.floor((overlapIndex - 1) / slotsPerRing) + 1;
+            const angle = slot * (Math.PI * 2 / slotsPerRing);
+            const radius = 0.0005 * ring;
+
+            return new kakao.maps.LatLng(
+                lat + Math.sin(angle) * radius,
+                lng + Math.cos(angle) * radius
+            );
+        }
+
         function createMarker(contact) {
-            const pos = new kakao.maps.LatLng(contact.lat, contact.lng);
+            const pos = getDisplayPosition(contact);
             const marker = new kakao.maps.Marker({ position: pos, map: map });
             marker.contactData = contact;
             
