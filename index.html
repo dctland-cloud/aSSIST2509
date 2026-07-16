@@ -297,6 +297,7 @@
             ).length;
 
             markerBasePositions.push({ lat, lng });
+            contact.displayOverlapIndex = overlapIndex;
             if(overlapIndex === 0) {
                 return new kakao.maps.LatLng(lat, lng);
             }
@@ -326,6 +327,9 @@
                 position: pos,
                 content: overlayContent,
                 map: map,
+                xAnchor: contact.displayOverlapIndex === 0
+                    ? 0.5
+                    : (contact.displayOverlapIndex % 2 === 1 ? -0.2 : 1.2),
                 yAnchor: 0
             });
             marker.customOverlay = customOverlay;
